@@ -5,7 +5,7 @@ const express = require('express')
 const app = express()
 
 const privateKey = process.env.privateKey;
-const provider = 'https://speedy-nodes-nyc.moralis.io/76b2f29afb9fc6b2be292ca2/polygon/mainnet';
+const provider = 'https://polygon-rpc.com';
 const contractAddress = '0x8639cbd0acdd07dd4b9c1ee7d0f39b31d4ce32cf';
 const creationAddress = '0xcb3bf46fe23e0caa8843160e6dae78c374624ddd';
 const customHttpProvider = new ethers.providers.JsonRpcProvider(provider)
@@ -25,18 +25,18 @@ class Queue {
      * @returns {Promise<T>}
      */
     async enqueue(func) {
-        if(++this.__active > this.maxSimultaneously) {
+        if (++this.__active > this.maxSimultaneously) {
             await new Promise(resolve => this.__queue.push(resolve));
         }
 
         try {
             return await func();
-        } catch(err) {
+        } catch (err) {
             throw err;
         } finally {
             this.__active--;
             console.log('Queue length: ' + this.__queue.length)
-            if(this.__queue.length) {
+            if (this.__queue.length) {
                 this.__queue.shift()();
             }
         }
@@ -47,7 +47,7 @@ const q = new Queue();
 
 async function init() {
     const contractName = await contract.name()
-    console.log('Connected to: ',contractName)
+    console.log('Connected to: ', contractName)
 
     let filter = contract.filters.Transfer('0x0000000000000000000000000000000000000000', null, null)
 
@@ -62,7 +62,7 @@ async function getTrans(event, tokenId) {
 
     const transaction = await event.getTransaction();
 
-    if(transaction) {
+    if (transaction) {
         const to = transaction.from;
         console.log('Found new Transfer to: ' + to)
         // q.enqueue(() => doTrans(to, tokenId));
